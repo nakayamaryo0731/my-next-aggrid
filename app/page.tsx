@@ -1,91 +1,64 @@
-import Image from 'next/image'
-import { Inter } from '@next/font/google'
-import styles from './page.module.css'
+"use client";
 
-const inter = Inter({ subsets: ['latin'] })
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { useRouter } from 'next/navigation';
+import { AgGridReact } from 'ag-grid-react';
 
-export default function Home() {
+import 'ag-grid-community/styles/ag-grid.css';
+import 'ag-grid-community/styles/ag-theme-alpine.css';
+
+const Home = () =>  {
+  const gridRef = useRef();
+  const router = useRouter();
+  const [rowData, setRowData] = useState();
+
+   // Example load data from sever
+ useEffect(() => {
+  fetch('https://www.ag-grid.com/example-assets/row-data.json')
+  .then(result => result.json())
+  .then(rowData => setRowData(rowData))
+}, []);
+
+// // Example using Grid's API
+// const buttonListener = useCallback( e => {
+//   gridRef.current?.api.deselectAll();
+// }, []);
+
+  // const onSelectionChanged = useCallback(() => {
+  //   // const selectedRows = gridRef.current.api.getSelectedRows();
+  //   const selectedRows = gridRef.current!
+  //   router.push(`/staff/${selectedRows[0].id}`);
+  // }, [router]);
+
+  const defaultColDef = {
+    resizable: true,
+    sortable: true,
+  };
+
+ // Each Column Definition results in one Column.
+ const [columnDefs, setColumnDefs] = useState([
+  {field: 'make', filter: true},
+  {field: 'model', filter: true},
+  {field: 'price'}
+]);
+
+console.log(gridRef);
+
+
   return (
-    <main className={styles.main}>
-      <div className={styles.description}>
-        <p>
-          Get started by editing&nbsp;
-          <code className={styles.code}>app/page.tsx</code>
-        </p>
-        <div>
-          <a
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{' '}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className={styles.vercelLogo}
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
-      </div>
-
-      <div className={styles.center}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-        <div className={styles.thirteen}>
-          <Image src="/thirteen.svg" alt="13" width={40} height={31} priority />
-        </div>
-      </div>
-
-      <div className={styles.grid}>
-        <a
-          href="https://beta.nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={inter.className}>
-            Docs <span>-&gt;</span>
-          </h2>
-          <p className={inter.className}>
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={inter.className}>
-            Templates <span>-&gt;</span>
-          </h2>
-          <p className={inter.className}>Explore the Next.js 13 playground.</p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={inter.className}>
-            Deploy <span>-&gt;</span>
-          </h2>
-          <p className={inter.className}>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
-  )
+    <div className="ag-theme-alpine" style={{ height: '600px' }}>
+      <AgGridReact
+        id="staff_grid"
+        ref={gridRef}
+        rowData={rowData}
+        // defaultColDef={defaultColDef}
+        columnDefs={columnDefs}
+        // onSelectionChanged={onSelectionChanged}
+        rowSelection={'single'}
+        // style={{ height: '100%', width: '100%' }}
+      ></AgGridReact>
+    </div>
+  );
 }
+
+export default Home;
